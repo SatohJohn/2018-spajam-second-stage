@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import john.example.jp.kotlinproject.R
+import john.example.jp.kotlinproject.activity.TestActivity
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val MY_REQUEST_CODE = 0
@@ -24,9 +25,9 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値
-            val intent: Intent = Intent(this, CameraActivity::class.java)
-            intent.putExtra("number", 120)
-            intent.putExtra("string", "The message from MainActivity")
+            val intent: Intent = Intent(this, TestActivity::class.java)
+//            intent.putExtra("number", 120)
+//            intent.putExtra("string", "The message from MainActivity")
 
             // 新しくアクティビティを開く
             startActivityForResult(intent, MY_REQUEST_CODE)
