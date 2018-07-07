@@ -18,28 +18,25 @@ package john.example.jp.kotlinproject
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
-import android.graphics.*
+import android.graphics.Matrix
+import android.graphics.RectF
+import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.hardware.camera2.CameraCharacteristics.*
+import android.hardware.camera2.CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP
+import android.hardware.camera2.CameraCharacteristics.SENSOR_ORIENTATION
 import android.hardware.camera2.CameraDevice.TEMPLATE_PREVIEW
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.media.AudioFormat
-import android.media.AudioRecord
 import android.media.ImageReader
 import android.media.MediaRecorder
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
-import android.support.constraint.ConstraintSet
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -49,18 +46,14 @@ import android.util.Size
 import android.util.SparseIntArray
 import android.view.*
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import kotlinx.android.synthetic.main.activity_camera.*
-import kotlinx.android.synthetic.main.activity_camera.view.*
-import kotlinx.android.synthetic.main.activity_gps.*
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
-import kotlin.math.max
 
 class CameraVideoFragment : Fragment(), View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback, LocationListener {
