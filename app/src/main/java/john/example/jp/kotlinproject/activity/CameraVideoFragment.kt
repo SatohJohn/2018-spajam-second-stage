@@ -28,6 +28,9 @@ import android.hardware.camera2.*
 import android.hardware.camera2.CameraCharacteristics.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_PREVIEW
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.ImageReader
@@ -51,6 +54,7 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlinx.android.synthetic.main.activity_camera.view.*
+import kotlinx.android.synthetic.main.activity_gps.*
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -59,8 +63,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.max
 
 class CameraVideoFragment : Fragment(), View.OnClickListener,
-        ActivityCompat.OnRequestPermissionsResultCallback {
-
+        ActivityCompat.OnRequestPermissionsResultCallback, LocationListener {
 
     var _record: Timer? = null
     var _isRecording = false
@@ -207,6 +210,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                               savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.activity_camera, container, false)
 
+    // ide上でlocationManager#requestLocationUpdatesがエラー表示されてしまうため追加
+    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         textureView = view.findViewById(R.id.textureView)
         changeButton = view.findViewById<Button>(R.id.changeButton).also {
@@ -219,6 +224,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         else
             doRecord()
 
+        locationManager = getActivity()?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f, this)
     }
 
     override fun onResume() {
@@ -700,14 +707,21 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         fun newInstance(): CameraVideoFragment = CameraVideoFragment()
     }
 
-
     override fun onPause() {
+        //recordに使っているtimerを先に開放しないと落ちる可能性がある
         stopRecord()
+
         closeCamera()
         stopBackgroundThread()
+
+        locationManager?.removeUpdates(this)
+
         super.onPause()
     }
 
+    /***********************************
+     * record部分
+     ***********************************/
     fun stopRecord(){
         _isRecording = false
         _record?.cancel()
@@ -724,8 +738,33 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
     inner class RecorderTask : TimerTask() {
         override fun run() {
             // これで音の大きさが1秒ごとに取れているっぽい
-            Log.v("MicInfoService", "amplitude: " + mediaRecorder?.getMaxAmplitude());
+            val maxAmplitude = mediaRecorder?.getMaxAmplitude() ?: 0
+            Log.v(this::class.java.simpleName, "amplitude: " + maxAmplitude);
+            if (maxAmplitude > 3000) {
+                Log.i(this::class.java.simpleName, "発火するよ");
+            }
         }
     }
 
+    /***********************************
+     * GPS部分
+     ***********************************/
+    private var locationManager: LocationManager? = null
+
+    override fun onLocationChanged(location: Location) {
+        Log.i("onLocationChanged", "latitude: " + location.getLatitude() + ", longitude: " + location.getLongitude());
+        // 適当な場所で発火させる
+    }
+
+    override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
+        // 下のenabled and disabledのやつ
+    }
+
+    override fun onProviderEnabled(p0: String?) {
+        // ネットワークからの復旧をした
+    }
+
+    override fun onProviderDisabled(p0: String?) {
+        // ネットワークから切れた
+    }
 }

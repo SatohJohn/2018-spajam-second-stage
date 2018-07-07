@@ -1,23 +1,13 @@
 package john.example.jp.kotlinproject
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.icu.text.AlphabeticIndex
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
-import android.media.AudioFormat
-import android.media.AudioRecord
-import android.media.MediaRecorder
-import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.SurfaceView
-import android.widget.Button
-import john.example.jp.kotlinproject.activity.GPSActivity
-import kotlin.math.max
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import john.example.jp.kotlinproject.activity.UserInfoViewPagerAdapter
