@@ -48,19 +48,19 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値
-            val intent: Intent = Intent(this, GPSActivity::class.java)
+//            val intent: Intent = Intent(this, GPSActivity::class.java)
 //            intent.putExtra("number", 120)
 //            intent.putExtra("string", "The message from MainActivity")
 //
 //            // 新しくアクティビティを開く
-            startActivityForResult(intent, MY_REQUEST_CODE)
-//            if(_isRecording)
-//                stopRecord()
-//            else
-//                doRecord()
-//            savedInstanceState ?: supportFragmentManager.beginTransaction()
-//                    .replace(R.id.container, CameraVideoFragment.newInstance())
-//                    .commit()
+//            startActivityForResult(intent, MY_REQUEST_CODE)
+            if(_isRecording)
+                stopRecord()
+            else
+                doRecord()
+            savedInstanceState ?: supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, CameraVideoFragment.newInstance())
+                    .commit()
 
         }
 
