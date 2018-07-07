@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.SurfaceView
 import android.widget.Button
+import john.example.jp.kotlinproject.activity.GPSActivity
 import kotlin.math.max
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値
-//            val intent: Intent = Intent(this, CameraActivity::class.java)
+//            val intent: Intent = Intent(this, GPSActivity::class.java)
 //            intent.putExtra("number", 120)
 //            intent.putExtra("string", "The message from MainActivity")
 //
@@ -66,6 +67,8 @@ class MainActivity : AppCompatActivity() {
         val permissionGrantedList: List<String> = arrayOf(
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
 //                Manifest.permission.INTERNET,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
