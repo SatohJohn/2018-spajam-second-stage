@@ -1,5 +1,7 @@
 package john.example.jp.kotlinproject.utils
 
+import android.media.MediaPlayer
+import android.util.Log
 import com.coremedia.iso.boxes.Container
 import com.coremedia.iso.boxes.MovieHeaderBox
 import com.googlecode.mp4parser.FileDataSourceImpl
@@ -13,13 +15,27 @@ import com.googlecode.mp4parser.util.Path
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.math.log
 
 object MovieFileTrimer {
     /**
      * srcFileは存在しなかったらエラー
      * 動画の長さが足りなければエラー
      */
-    fun test(srcFile: File, destDirectory: File, startMs: Long, endMs: Long) {
+    fun test(srcFile: File, destDirectory: File) {
+
+        val mp = MediaPlayer()
+        mp.setDataSource(srcFile.path)
+        mp.prepare();
+        val endMs = mp.duration
+        val startMs = endMs - 5000
+
+        if (startMs < 0)
+        {
+            // 5秒未満のためトリミングの必要なし
+            return
+        }
+
         val movieFile = FileDataSourceImpl(srcFile)
         val movie: Movie = MovieCreator.build(movieFile)
 
@@ -52,6 +68,8 @@ object MovieFileTrimer {
             }
             movie.addTrack(CroppedTrack(track, startSample, endSample))
         }
+
+        Log.i("TEST", srcFile.name + " " + startMs.toString() + " " + endMs.toString())
 
         // 保存する
         val out: Container = DefaultMp4Builder().build(movie)

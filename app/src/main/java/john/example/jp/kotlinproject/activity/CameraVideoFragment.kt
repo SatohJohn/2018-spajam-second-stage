@@ -139,6 +139,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      */
     private var isRecordingVideo = false
 
+    private var filePath = ""
+
     /**
      * An additional thread for running tasks that shouldn't block the UI.
      */
@@ -222,9 +224,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         locationManager = getActivity()?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f, this)
-
-        // trim用のインジケータ
-        trimEndMs = System.currentTimeMillis()
     }
 
     override fun onResume() {
@@ -256,6 +255,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
                 if (isRecordingVideo == true) {
                     stopRecordingVideo()
+                    trimMovie(File(filePath))
                 }
 
                 closeCamera()
@@ -580,8 +580,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun getVideoFilePath(context: Context?): String {
 
-        var fileName = CameraUtil.getFileName(".mp4")
-        return CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
+        val fileName = CameraUtil.getFileName(".mp4")
+        filePath = CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
+        return filePath
     }
 
     private fun startRecordingVideo() {
@@ -618,6 +619,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                             activity?.runOnUiThread {
                                 mediaRecorder?.start()
                             }
+
+                            // trim用のインジケータ
+                            trimEndMs = System.currentTimeMillis()
                         }
 
                         override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {
@@ -782,7 +786,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         if (movieEndTimeMs > TRIM_TIME_MS) {
             // 動画保存で失敗する場合この時間を少し前だおししたほうがいいかも
             val trimStartMs: Long = movieEndTimeMs - TRIM_TIME_MS
-            MovieFileTrimer.test(movieFile, CameraUtil.getDirectoryInfo(), trimStartMs, movieEndTimeMs)
+            MovieFileTrimer.test(movieFile, CameraUtil.getDirectoryInfo())
             trimEndMs = System.currentTimeMillis()
         }
     }
