@@ -3,15 +3,16 @@ package john.example.jp.kotlinproject
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.ImageFormat
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraAccessException
 import android.media.ImageReader
 import android.os.Handler
+import android.support.constraint.ConstraintSet
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
+import kotlinx.android.synthetic.main.activity_camera.*
 import java.util.*
 
 class CameraStateMachine {
@@ -36,9 +37,14 @@ class CameraStateMachine {
         nextState(mInitSurfaceState)
     }
 
+//    fun takePicture(listener: ImageReader.OnImageAvailableListener): Boolean {
+//        if (mState !== mPreviewState) return false
+//        mTakePictureListener = listener
+//        nextState(mAutoFocusState)
+//        return true
+//    }
+
     fun takePicture(listener: ImageReader.OnImageAvailableListener): Boolean {
-        if (mState !== mPreviewState) return false
-        mTakePictureListener = listener
         nextState(mAutoFocusState)
         return true
     }
@@ -226,6 +232,7 @@ class CameraStateMachine {
         private fun onCaptureResult(result: CaptureResult, isCompleted: Boolean) {
             try {
                 if (mState != null) (mState as State).onCaptureResult(result, isCompleted)
+
             } catch (e: CameraAccessException) {
                 Log.e(TAG, "handle():", e)
                 nextState(mAbortState)

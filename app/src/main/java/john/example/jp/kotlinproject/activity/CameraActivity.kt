@@ -33,6 +33,35 @@ class CameraActivity : AppCompatActivity() {
         setContentView(R.layout.activity_camera)
 
         mCamera = CameraStateMachine()
+
+        (mCamera as CameraStateMachine).takePicture(object : ImageReader.OnImageAvailableListener {
+            @SuppressLint("WrongConstant")
+            override fun onImageAvailable(reader: ImageReader) {
+                // 撮れた画像をImageViewに貼り付けて表示。
+                val image = reader.acquireLatestImage()
+                val buffer = image.getPlanes()[0].getBuffer()
+                val bytes = ByteArray(buffer.remaining())
+                buffer.get(bytes)
+                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                image.close()
+
+                val matrix = Matrix()
+                matrix.postRotate(90f)
+                val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+
+                imageView.setImageBitmap(rotatedBitmap)
+                imageView.setVisibility(VISIBLE)
+                textureView.setVisibility(INVISIBLE)
+
+                CameraUtil.saveBitmap(rotatedBitmap, contentResolver)
+
+                (mCamera as CameraStateMachine).close()
+
+                savedInstanceState ?: supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, CameraVideoFragment.newInstance())
+                        .commit()
+            }
+        })
     }
 
 

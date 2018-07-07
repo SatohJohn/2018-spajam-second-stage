@@ -19,16 +19,18 @@ package john.example.jp.kotlinproject
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
+import android.graphics.ImageFormat
 import android.graphics.Matrix
 import android.graphics.RectF
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.*
-import android.hardware.camera2.CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP
-import android.hardware.camera2.CameraCharacteristics.SENSOR_ORIENTATION
+import android.hardware.camera2.CameraCharacteristics.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_PREVIEW
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
+import android.media.ImageReader
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
@@ -101,6 +103,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      * Button to record video
      */
     private lateinit var videoButton: Button
+    private lateinit var changeButton: Button
 
     /**
      * A reference to the opened [android.hardware.camera2.CameraDevice].
@@ -153,6 +156,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      */
     private var sensorOrientation = 0
 
+    private var useCameraKind = CameraMetadata.LENS_FACING_BACK
+
     /**
      * [CameraDevice.StateCallback] is called when [CameraDevice] changes its status.
      */
@@ -197,6 +202,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         videoButton = view.findViewById<Button>(R.id.button).also {
             it.setOnClickListener(this)
         }
+        changeButton = view.findViewById<Button>(R.id.changeButton).also {
+            it.setOnClickListener(this)
+        }
         info.setOnClickListener(this)
     }
 
@@ -230,6 +238,28 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                             .setMessage("Error")
                             .setPositiveButton(android.R.string.ok, null)
                             .show()
+                }
+            }
+            R.id.changeButton -> {
+
+                closeCamera()
+                stopBackgroundThread()
+
+                if (useCameraKind == CameraMetadata.LENS_FACING_BACK)
+                {
+                    useCameraKind = CameraMetadata.LENS_FACING_FRONT
+                }
+                else
+                {
+                    useCameraKind = CameraMetadata.LENS_FACING_BACK
+                }
+
+                startBackgroundThread()
+
+                if (textureView.isAvailable) {
+                    openCamera(textureView.width, textureView.height)
+                } else {
+                    textureView.surfaceTextureListener = surfaceTextureListener
                 }
             }
         }
@@ -326,25 +356,30 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             if (!cameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw RuntimeException("Time out waiting to lock camera opening.")
             }
-            val cameraId = manager.cameraIdList[0]
 
-            // Choose the sizes for camera preview and video recording
-            val characteristics = manager.getCameraCharacteristics(cameraId)
-            val map = characteristics.get(SCALER_STREAM_CONFIGURATION_MAP) ?:
-            throw RuntimeException("Cannot get available preview/video sizes")
-            sensorOrientation = characteristics.get(SENSOR_ORIENTATION)
-            videoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder::class.java))
-            previewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture::class.java),
-                    width, height, videoSize)
+            for (cameraId in (manager as CameraManager).getCameraIdList()) {
+                var characteristics = (manager as CameraManager).getCameraCharacteristics(cameraId)
+                if (characteristics.get(CameraCharacteristics.LENS_FACING) == useCameraKind) {
 
-            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                textureView.setAspectRatio(previewSize.width, previewSize.height)
-            } else {
-                textureView.setAspectRatio(previewSize.height, previewSize.width)
+                    // Choose the sizes for camera preview and video recording
+                    val characteristics = manager.getCameraCharacteristics(cameraId)
+                    val map = characteristics.get(SCALER_STREAM_CONFIGURATION_MAP) ?:
+                    throw RuntimeException("Cannot get available preview/video sizes")
+                    sensorOrientation = characteristics.get(SENSOR_ORIENTATION)
+                    videoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder::class.java))
+                    previewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture::class.java), width, height, videoSize)
+
+                    if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        textureView.setAspectRatio(previewSize.width, previewSize.height)
+                    } else {
+                        textureView.setAspectRatio(previewSize.height, previewSize.width)
+                    }
+                    configureTransform(width, height)
+                    mediaRecorder = MediaRecorder()
+                    manager.openCamera(cameraId, stateCallback, null)
+                }
             }
-            configureTransform(width, height)
-            mediaRecorder = MediaRecorder()
-            manager.openCamera(cameraId, stateCallback, null)
+
         } catch (e: CameraAccessException) {
             showToast("Cannot access the camera.")
             cameraActivity.finish()
@@ -611,5 +646,4 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
     companion object {
         fun newInstance(): CameraVideoFragment = CameraVideoFragment()
     }
-
 }
