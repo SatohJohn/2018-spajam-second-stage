@@ -16,6 +16,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.SurfaceView
 import android.widget.Button
+import john.example.jp.kotlinproject.activity.GPSActivity
 import kotlin.math.max
 
 const val MY_REQUEST_CODE = 0
@@ -35,19 +36,19 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値
-//            val intent: Intent = Intent(this, CameraActivity::class.java)
+            val intent: Intent = Intent(this, GPSActivity::class.java)
 //            intent.putExtra("number", 120)
 //            intent.putExtra("string", "The message from MainActivity")
 //
 //            // 新しくアクティビティを開く
-//            startActivityForResult(intent, MY_REQUEST_CODE)
-            if(_isRecording)
-                stopRecord()
-            else
-                doRecord()
-            savedInstanceState ?: supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, CameraVideoFragment.newInstance())
-                    .commit()
+            startActivityForResult(intent, MY_REQUEST_CODE)
+//            if(_isRecording)
+//                stopRecord()
+//            else
+//                doRecord()
+//            savedInstanceState ?: supportFragmentManager.beginTransaction()
+//                    .replace(R.id.container, CameraVideoFragment.newInstance())
+//                    .commit()
 
         }
 
@@ -140,6 +141,8 @@ class MainActivity : AppCompatActivity() {
         val permissionGrantedList: List<String> = arrayOf(
                 Manifest.permission.RECORD_AUDIO,
                 Manifest.permission.CAMERA,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
 //                Manifest.permission.INTERNET,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
