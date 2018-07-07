@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <john.example.jp.kotlinproject.AutoFitTextureView
+        <john.example.jp.kotlinproject.activity.AutoFitTextureView
             android:id="@+id/textureView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

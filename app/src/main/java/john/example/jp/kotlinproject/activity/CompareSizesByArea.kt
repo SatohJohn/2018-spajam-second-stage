@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 /*
  * Copyright 2017 The Android Open Source Project

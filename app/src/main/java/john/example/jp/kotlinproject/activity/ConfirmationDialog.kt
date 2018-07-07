@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 /*
  * Copyright 2017 The Android Open Source Project
@@ -20,8 +20,6 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import john.example.jp.kotlinproject.R
-import john.example.jp.kotlinproject.activity.REQUEST_VIDEO_PERMISSIONS
-import john.example.jp.kotlinproject.activity.VIDEO_PERMISSIONS
 
 /**
  * Shows OK/Cancel confirmation dialog about camera permission.

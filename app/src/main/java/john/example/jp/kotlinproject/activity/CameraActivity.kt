@@ -1,29 +1,19 @@
 package john.example.jp.kotlinproject.activity
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ImageReader
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
 import android.support.constraint.ConstraintSet.INVISIBLE
 import android.support.constraint.ConstraintSet.VISIBLE
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
-import john.example.jp.kotlinproject.CameraStateMachine
 import john.example.jp.kotlinproject.CameraUtil
 import john.example.jp.kotlinproject.R
 import kotlinx.android.synthetic.main.activity_camera.*
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.sql.Date
-import java.text.SimpleDateFormat
 
 
 class CameraActivity : AppCompatActivity() {

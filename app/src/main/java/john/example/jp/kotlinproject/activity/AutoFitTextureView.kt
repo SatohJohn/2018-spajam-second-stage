@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 import android.content.Context
 import android.util.AttributeSet

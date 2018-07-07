@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -12,6 +12,7 @@ import android.support.constraint.ConstraintSet
 import android.util.Log
 import android.view.Surface
 import android.view.TextureView
+import john.example.jp.kotlinproject.CameraUtil
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.util.*
 
