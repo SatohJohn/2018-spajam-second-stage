@@ -113,7 +113,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
     /**
      * Button to record video
      */
-    private lateinit var videoButton: Button
     private lateinit var changeButton: Button
 
     /**
@@ -211,9 +210,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         textureView = view.findViewById(R.id.textureView)
-        videoButton = view.findViewById<Button>(R.id.button).also {
-            it.setOnClickListener(this)
-        }
         changeButton = view.findViewById<Button>(R.id.changeButton).also {
             it.setOnClickListener(this)
         }
@@ -223,6 +219,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             stopRecord()
         else
             doRecord()
+
     }
 
     override fun onResume() {
@@ -242,7 +239,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.button -> if (isRecordingVideo) restartRecordingVideo() else startRecordingVideo()
             R.id.info -> {
                 if (activity != null) {
                     AlertDialog.Builder(activity)
@@ -499,6 +495,12 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     takepicture()
                     changeButton.callOnClick()
                 }
+                else {
+                    if (isRecordingVideo == false) {
+                        isRecordingVideo = true
+                        startRecordingVideo()
+                    }
+                }
             } catch (e: CameraAccessException) {
                 Log.e(TAG, "handle():", e)
             }
@@ -609,8 +611,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                             captureSession = cameraCaptureSession
                             updatePreview()
                             activity?.runOnUiThread {
-                                videoButton.setText(R.string.stop)
-                                isRecordingVideo = true
                                 mediaRecorder?.start()
                             }
                         }
@@ -644,7 +644,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun stopRecordingVideo() {
         isRecordingVideo = false
-        videoButton.setText(R.string.record)
         mediaRecorder?.apply {
             stop()
             reset()

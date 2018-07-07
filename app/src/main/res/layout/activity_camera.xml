@@ -30,15 +30,6 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_weight="1"
-                android:onClick="onClickShutter"
-                android:src="@android:drawable/ic_menu_camera"
-                android:text="Record" />
-
-            <Button
                 android:id="@+id/changeButton"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
