@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 /*
  * Copyright 2017 The Android Open Source Project
@@ -48,6 +48,7 @@ import android.view.*
 import android.widget.Button
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import john.example.jp.kotlinproject.*
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File

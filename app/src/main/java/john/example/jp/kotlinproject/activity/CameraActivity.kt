@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -15,6 +15,8 @@ import android.support.constraint.ConstraintSet.VISIBLE
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.View
+import john.example.jp.kotlinproject.CameraStateMachine
+import john.example.jp.kotlinproject.CameraUtil
 import john.example.jp.kotlinproject.R
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File

@@ -1,4 +1,4 @@
-package john.example.jp.kotlinproject
+package john.example.jp.kotlinproject.activity
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
-import john.example.jp.kotlinproject.activity.UserInfoViewPagerAdapter
-
-
-const val MY_REQUEST_CODE = 0
+import john.example.jp.kotlinproject.R
 
 class MainActivity : AppCompatActivity() {
 
