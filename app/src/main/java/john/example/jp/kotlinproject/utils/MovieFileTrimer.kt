@@ -1,7 +1,5 @@
 package john.example.jp.kotlinproject.utils
 
-import android.os.Environment
-import android.util.Log
 import com.coremedia.iso.boxes.Container
 import com.coremedia.iso.boxes.MovieHeaderBox
 import com.googlecode.mp4parser.FileDataSourceImpl
@@ -18,11 +16,10 @@ import java.util.*
 
 object MovieFileTrimer {
     /**
-     * srcFileとdestFileは存在しなかったらエラー
+     * srcFileは存在しなかったらエラー
      * 動画の長さが足りなければエラー
-     * 保存に成功した場合trueを返す
      */
-    fun test(srcFile: File, destFile: File, startMs: Int, endMs: Int): Boolean {
+    fun test(srcFile: File, destDirectory: File, startMs: Int, endMs: Int) {
         val movieFile = FileDataSourceImpl(srcFile)
         val movie: Movie = MovieCreator.build(movieFile)
 
@@ -60,15 +57,23 @@ object MovieFileTrimer {
         val out: Container = DefaultMp4Builder().build(movie)
         val mvhd: MovieHeaderBox = Path.getPath(out, "moov/mvhd")
         mvhd.setMatrix(Matrix.ROTATE_180)
-        val fos = FileOutputStream(destFile)
+
+        val tmpFile: File = File(destDirectory.absolutePath + "${System.currentTimeMillis()}-temp.mp4")
+        if (!tmpFile.exists()) {
+            tmpFile.createNewFile();
+        }
+        val fos = FileOutputStream(tmpFile)
         val fc = fos.getChannel()
         try {
             out.writeContainer(fc)
-            return true
         } finally {
             fc.close()
             fos.close()
             movieFile.close()
+            //
+            tmpFile.deleteOnExit()
         }
+
+        tmpFile.copyTo(srcFile, true)
     }
 }

@@ -33,14 +33,15 @@ class TestActivity: AppCompatActivity() {
         }.first()
         // movieFileがなかったら死亡
         Log.i(this::class.java.simpleName, movieFile.name)
-        val destFile = File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR + "test.mp4")
-        if (!destFile.exists()) {
-            destFile.createNewFile()
-        }
+//        val destFile = File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR + "test.mp4")
+//        if (!destFile.exists()) {
+//            destFile.createNewFile()
+//        }
 
+        // ミリ秒です
         val startMs = 1000
         val endMs = 3500
 
-        MovieFileTrimer.test(movieFile, destFile, startMs, endMs)
+        MovieFileTrimer.test(movieFile, saveFolder, startMs, endMs)
     }
 }
