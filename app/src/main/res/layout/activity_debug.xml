@@ -23,7 +23,8 @@
             android:id="@+id/debugAudioSeekBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="20000"
+            android:elevation="0dp"
+            android:max="60000"
             android:progress="4000" />
     </LinearLayout>
 

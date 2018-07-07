@@ -49,6 +49,7 @@ import android.widget.Button
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
+import john.example.jp.kotlinproject.data.ThresholdData
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File
@@ -743,7 +744,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             // これで音の大きさが1秒ごとに取れているっぽい
             val maxAmplitude = mediaRecorder?.getMaxAmplitude() ?: 0
             Log.v(this::class.java.simpleName, "amplitude: " + maxAmplitude);
-            if (maxAmplitude > 3000) {
+            if (maxAmplitude > ThresholdData.audioThreshold) {
                 Log.i(this::class.java.simpleName, "発火するよ");
                 // TODO:このタイミングでtrimMovieを呼び出す
             }
