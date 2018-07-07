@@ -1,6 +1,7 @@
 package john.example.jp.kotlinproject.activity
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -43,6 +44,13 @@ class MainActivity : AppCompatActivity() {
                     .replace(R.id.container, CameraVideoFragment.newInstance())
                     .commit()
 
+        }
+
+        debugButton.setOnClickListener {
+            Log.i(this::class.java.simpleName, "hi debug mode!")
+            // 新しくアクティビティを開く
+            val intent: Intent = Intent(this, DebugActivity::class.java)
+            startActivity(intent)
         }
 
     }
