@@ -3,12 +3,11 @@ package john.example.jp.kotlinproject
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import john.example.jp.kotlinproject.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 const val MY_REQUEST_CODE = 0
@@ -24,12 +23,16 @@ class MainActivity : AppCompatActivity() {
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値
-            val intent: Intent = Intent(this, CameraActivity::class.java)
-            intent.putExtra("number", 120)
-            intent.putExtra("string", "The message from MainActivity")
+//            val intent: Intent = Intent(this, CameraActivity::class.java)
+//            intent.putExtra("number", 120)
+//            intent.putExtra("string", "The message from MainActivity")
+//
+//            // 新しくアクティビティを開く
+//            startActivityForResult(intent, MY_REQUEST_CODE)
 
-            // 新しくアクティビティを開く
-            startActivityForResult(intent, MY_REQUEST_CODE)
+            savedInstanceState ?: supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, CameraVideoFragment.newInstance())
+                    .commit()
         }
     }
 

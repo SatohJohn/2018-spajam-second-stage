@@ -76,46 +76,9 @@ class CameraActivity : AppCompatActivity() {
                 imageView.setVisibility(VISIBLE)
                 textureView.setVisibility(INVISIBLE)
 
-                saveBitmap(rotatedBitmap)
+                CameraUtil.saveBitmap(rotatedBitmap, contentResolver)
             }
         })
     }
 
-    @Throws(IOException::class)
-    fun saveBitmap(saveImage: Bitmap) {
-
-        val SAVE_DIR = "/MyPhoto/"
-        val file = File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR)
-        try {
-            if (!file.exists()) {
-                file.mkdir()
-            }
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-            throw e
-        }
-
-        val mDate = Date(System.currentTimeMillis())
-        val fileNameDate = SimpleDateFormat("yyyyMMdd_HHmmss")
-        val fileName = fileNameDate.format(mDate) + ".jpg"
-        val AttachName = file.getAbsolutePath() + "/" + fileName
-
-        try {
-            val out = FileOutputStream(AttachName)
-            saveImage.compress(CompressFormat.JPEG, 100, out)
-            out.flush()
-            out.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            throw e
-        }
-
-        // save index
-        val values = ContentValues()
-        val contentResolver = contentResolver
-        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-        values.put(MediaStore.Images.Media.TITLE, fileName)
-        values.put("_data", AttachName)
-        contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
-    }
 }

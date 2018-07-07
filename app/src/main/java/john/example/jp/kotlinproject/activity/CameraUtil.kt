@@ -1,12 +1,22 @@
 package john.example.jp.kotlinproject
 
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.params.StreamConfigurationMap
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.media.ImageReader
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Size
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.sql.Date
+import java.text.SimpleDateFormat
 
 class CameraUtil {
 
@@ -59,6 +69,55 @@ class CameraUtil {
             }
 //            return previewSize
             return Size(resolutionX, resolutionY)
+        }
+
+        @Throws(IOException::class)
+        fun saveBitmap(saveImage: Bitmap, contentResolver : ContentResolver) {
+
+            var fileName = getFileName(".jpg")
+            val AttachName = getDirectoryInfo().getAbsolutePath() + "/" + fileName
+
+            try {
+                val out = FileOutputStream(AttachName)
+                saveImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                out.flush()
+                out.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                throw e
+            }
+
+            // save index
+            val values = ContentValues()
+            val contentResolver = contentResolver
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            values.put(MediaStore.Images.Media.TITLE, fileName)
+            values.put("_data", AttachName)
+            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        }
+
+        fun getDirectoryInfo() : File{
+
+            val SAVE_DIR = "/idol/"
+            return File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR)
+        }
+
+        fun getFileName(extension : String) : String{
+
+            val file = getDirectoryInfo()
+            try {
+                if (!file.exists()) {
+                    file.mkdir()
+                }
+            } catch (e: SecurityException) {
+                e.printStackTrace()
+                throw e
+            }
+
+            val mDate = Date(System.currentTimeMillis())
+            val fileNameDate = SimpleDateFormat("yyyyMMdd_HHmmss")
+            return fileNameDate.format(mDate) + extension
+
         }
     }
 
