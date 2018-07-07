@@ -52,7 +52,7 @@ import android.widget.Toast.LENGTH_SHORT
 import kotlinx.android.synthetic.main.activity_camera.*
 import kotlinx.android.synthetic.main.activity_camera.view.*
 import java.io.IOException
-import java.util.Collections
+import java.util.*
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -62,9 +62,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
 
 
-    var _record: Record? = null
+    var _record: Timer? = null
     var _isRecording = false
-    var _button: Button? = null
 
     private val FRAGMENT_DIALOG = "dialog"
     private val TAG = "CameraVideoFragment"
@@ -703,81 +702,30 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
 
     override fun onPause() {
+        stopRecord()
         closeCamera()
         stopBackgroundThread()
         super.onPause()
-        stopRecord()
     }
 
     fun stopRecord(){
         _isRecording = false
-        _button?.text = "start"
-        _record?.cancel(true)
+        _record?.cancel()
     }
 
     fun doRecord(){
         _isRecording = true
-        _button?.text = "stop"
 
         // AsyncTaskは使い捨て１回こっきりなので毎回作ります
-        _record = Record()
-        _record?.execute()
+        _record = Timer()
+        _record?.scheduleAtFixedRate(RecorderTask(), 0, 1000);
     }
 
-    inner class Record : AsyncTask<Void, DoubleArray, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-            // サンプリングレート。1秒あたりのサンプル数
-            // （8000, 11025, 22050, 44100, エミュでは8kbじゃないとだめ？）
-            val sampleRate = 44100
-
-            // 最低限のバッファサイズ
-            val minBufferSize = AudioRecord.getMinBufferSize(
-                    sampleRate,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT) * 2
-
-            // バッファサイズが取得できない。サンプリングレート等の設定を端末がサポートしていない可能性がある。
-            if(minBufferSize < 0){
-                return null
-            }
-
-            val audioRecord = AudioRecord(
-                    MediaRecorder.AudioSource.MIC,
-                    sampleRate,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    minBufferSize)
-
-            val sec = 1
-            val buffer: ShortArray = ShortArray(sampleRate * (16 / 8) * 1 * sec)
-
-            //audioRecord.startRecording()
-
-            try {
-                while (_isRecording) {
-                    val readSize = audioRecord.read(buffer, 0, minBufferSize)
-
-                    if (readSize < 0) {
-                        break
-                    }
-                    if (readSize == 0) {
-                        continue
-                    }
-                    var maxSound:Int = 0
-                    for(i in 0..readSize)
-                    {
-                        maxSound= max(maxSound,buffer[i].toInt())
-
-                    }
-                    Log.v("VolMax",maxSound.toString())
-                    //_visualizer?.update(buffer, readSize)
-                }
-            } finally {
-                audioRecord.stop()
-                audioRecord.release()
-            }
-
-            return null
+    inner class RecorderTask : TimerTask() {
+        override fun run() {
+            // これで音の大きさが1秒ごとに取れているっぽい
+            Log.v("MicInfoService", "amplitude: " + mediaRecorder?.getMaxAmplitude());
         }
     }
+
 }
