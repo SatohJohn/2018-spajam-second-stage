@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.SeekBar
 import john.example.jp.kotlinproject.R
+import john.example.jp.kotlinproject.data.ThresholdData
 import kotlinx.android.synthetic.main.activity_debug.*
 
 class DebugActivity : AppCompatActivity() {
@@ -14,13 +15,14 @@ class DebugActivity : AppCompatActivity() {
         setContentView(R.layout.activity_debug)
 
         debugAudioSeekBar.setOnSeekBarChangeListener(DebugSeekBar())
-        debugAudioSeekBar.progress = 1000
+        debugAudioSeekBar.progress = ThresholdData.audioThreshold
     }
 
     inner class DebugSeekBar: SeekBar.OnSeekBarChangeListener {
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             Log.i(this::class.java.simpleName, "${progress} : ${fromUser}")
             debugAudioText.text = "音の大きさ: ${progress}"
+            ThresholdData.audioThreshold = progress
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
