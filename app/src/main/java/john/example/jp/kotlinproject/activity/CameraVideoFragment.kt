@@ -28,8 +28,11 @@ import android.hardware.camera2.*
 import android.hardware.camera2.CameraCharacteristics.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_PREVIEW
 import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
+import android.media.AudioFormat
+import android.media.AudioRecord
 import android.media.ImageReader
 import android.media.MediaRecorder
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
@@ -53,9 +56,15 @@ import java.util.Collections
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.math.max
 
 class CameraVideoFragment : Fragment(), View.OnClickListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+
+    var _record: Record? = null
+    var _isRecording = false
+    var _button: Button? = null
 
     private val FRAGMENT_DIALOG = "dialog"
     private val TAG = "CameraVideoFragment"
@@ -209,6 +218,11 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             it.setOnClickListener(this)
         }
         info.setOnClickListener(this)
+
+        if(_isRecording)
+            stopRecord()
+        else
+            doRecord()
     }
 
     override fun onResume() {
@@ -224,12 +238,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         } else {
             textureView.surfaceTextureListener = surfaceTextureListener
         }
-    }
-
-    override fun onPause() {
-        closeCamera()
-        stopBackgroundThread()
-        super.onPause()
     }
 
     override fun onClick(view: View) {
@@ -692,5 +700,85 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     companion object {
         fun newInstance(): CameraVideoFragment = CameraVideoFragment()
+    }
+
+
+    override fun onPause() {
+        closeCamera()
+        stopBackgroundThread()
+        super.onPause()
+        stopRecord()
+    }
+
+    fun stopRecord(){
+        _isRecording = false
+        _button?.text = "start"
+        _record?.cancel(true)
+    }
+
+    fun doRecord(){
+        _isRecording = true
+        _button?.text = "stop"
+
+        // AsyncTaskは使い捨て１回こっきりなので毎回作ります
+        _record = Record()
+        _record?.execute()
+    }
+
+    inner class Record : AsyncTask<Void, DoubleArray, Void>() {
+        override fun doInBackground(vararg params: Void): Void? {
+            // サンプリングレート。1秒あたりのサンプル数
+            // （8000, 11025, 22050, 44100, エミュでは8kbじゃないとだめ？）
+            val sampleRate = 44100
+
+            // 最低限のバッファサイズ
+            val minBufferSize = AudioRecord.getMinBufferSize(
+                    sampleRate,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT) * 2
+
+            // バッファサイズが取得できない。サンプリングレート等の設定を端末がサポートしていない可能性がある。
+            if(minBufferSize < 0){
+                return null
+            }
+
+            val audioRecord = AudioRecord(
+                    MediaRecorder.AudioSource.MIC,
+                    sampleRate,
+                    AudioFormat.CHANNEL_IN_MONO,
+                    AudioFormat.ENCODING_PCM_16BIT,
+                    minBufferSize)
+
+            val sec = 1
+            val buffer: ShortArray = ShortArray(sampleRate * (16 / 8) * 1 * sec)
+
+            //audioRecord.startRecording()
+
+            try {
+                while (_isRecording) {
+                    val readSize = audioRecord.read(buffer, 0, minBufferSize)
+
+                    if (readSize < 0) {
+                        break
+                    }
+                    if (readSize == 0) {
+                        continue
+                    }
+                    var maxSound:Int = 0
+                    for(i in 0..readSize)
+                    {
+                        maxSound= max(maxSound,buffer[i].toInt())
+
+                    }
+                    Log.v("VolMax",maxSound.toString())
+                    //_visualizer?.update(buffer, readSize)
+                }
+            } finally {
+                audioRecord.stop()
+                audioRecord.release()
+            }
+
+            return null
+        }
     }
 }
