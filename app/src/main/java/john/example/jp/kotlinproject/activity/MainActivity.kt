@@ -18,6 +18,10 @@ import android.view.SurfaceView
 import android.widget.Button
 import john.example.jp.kotlinproject.activity.GPSActivity
 import kotlin.math.max
+import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
+import john.example.jp.kotlinproject.activity.UserInfoViewPagerAdapter
+
 
 const val MY_REQUEST_CODE = 0
 
@@ -26,13 +30,21 @@ class MainActivity : AppCompatActivity() {
     var _record:Record? = null
     var _isRecording = false
     var _button: Button? = null
+    var pager: ViewPager? = null
+
+    var adapter: FragmentPagerAdapter? = null
+
+    var currentPage: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         setupPermissions()
+        pager =  findViewById(R.id.pager)
 
+        adapter = UserInfoViewPagerAdapter(getSupportFragmentManager());
+        pager?.setAdapter(adapter);
+        currentPage = 0;
         button.setOnClickListener {
 
             // 新しく開くアクティビティに渡す値

@@ -18,14 +18,12 @@ package john.example.jp.kotlinproject
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
-import android.graphics.ImageFormat
-import android.graphics.Matrix
-import android.graphics.RectF
-import android.graphics.SurfaceTexture
+import android.graphics.*
 import android.hardware.camera2.*
 import android.hardware.camera2.CameraCharacteristics.*
 import android.hardware.camera2.CameraDevice.TEMPLATE_PREVIEW
@@ -35,6 +33,7 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
+import android.support.constraint.ConstraintSet
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -48,6 +47,7 @@ import android.widget.ImageButton
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import kotlinx.android.synthetic.main.activity_camera.*
+import kotlinx.android.synthetic.main.activity_camera.view.*
 import java.io.IOException
 import java.util.Collections
 import java.util.concurrent.Semaphore
@@ -98,6 +98,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      * An [AutoFitTextureView] for camera preview.
      */
     private lateinit var textureView: AutoFitTextureView
+
+    private lateinit var imageReader : ImageReader
 
     /**
      * Button to record video
@@ -157,6 +159,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
     private var sensorOrientation = 0
 
     private var useCameraKind = CameraMetadata.LENS_FACING_BACK
+    private var isChanged = false
 
     /**
      * [CameraDevice.StateCallback] is called when [CameraDevice] changes its status.
@@ -231,7 +234,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.button -> if (isRecordingVideo) stopRecordingVideo() else startRecordingVideo()
+            R.id.button -> if (isRecordingVideo) restartRecordingVideo() else startRecordingVideo()
             R.id.info -> {
                 if (activity != null) {
                     AlertDialog.Builder(activity)
@@ -242,8 +245,15 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             }
             R.id.changeButton -> {
 
+                if (isRecordingVideo == true) {
+                    stopRecordingVideo()
+                }
+
                 closeCamera()
-                stopBackgroundThread()
+
+                if (isChanged == false) {
+                    stopBackgroundThread()
+                }
 
                 if (useCameraKind == CameraMetadata.LENS_FACING_BACK)
                 {
@@ -254,7 +264,11 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     useCameraKind = CameraMetadata.LENS_FACING_BACK
                 }
 
-                startBackgroundThread()
+                isChanged = !isChanged
+
+                if (isChanged == false) {
+                    startBackgroundThread()
+                }
 
                 if (textureView.isAvailable) {
                     openCamera(textureView.width, textureView.height)
@@ -451,14 +465,37 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         if (cameraDevice == null) return
 
         try {
+
             setUpCaptureRequestBuilder(previewRequestBuilder)
             HandlerThread("CameraPreview").start()
-            captureSession?.setRepeatingRequest(previewRequestBuilder.build(),
-                    null, backgroundHandler)
+            captureSession?.setRepeatingRequest(previewRequestBuilder.build(), mCaptureCallback, backgroundHandler)
+
         } catch (e: CameraAccessException) {
             Log.e(TAG, e.toString())
         }
 
+    }
+
+    private var mCaptureCallback = object : CameraCaptureSession.CaptureCallback() {
+        override fun onCaptureProgressed(session: CameraCaptureSession, request: CaptureRequest, partialResult: CaptureResult) {
+            onCaptureResult(partialResult, false)
+        }
+
+        override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
+            onCaptureResult(result, true)
+        }
+
+        private fun onCaptureResult(result: CaptureResult, isCompleted: Boolean) {
+            try {
+                if (isChanged == true) {
+                    takepicture()
+                    changeButton.callOnClick()
+                }
+            } catch (e: CameraAccessException) {
+                Log.e(TAG, "handle():", e)
+            }
+
+        }
     }
 
     private fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder?) {
@@ -560,6 +597,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     object : CameraCaptureSession.StateCallback() {
 
                         override fun onConfigured(cameraCaptureSession: CameraCaptureSession) {
+
                             captureSession = cameraCaptureSession
                             updatePreview()
                             activity?.runOnUiThread {
@@ -581,9 +619,19 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     }
 
+    private fun takepicture()
+    {
+        CameraUtil.saveBitmap(textureView.bitmap)
+    }
+
     private fun closePreviewSession() {
         captureSession?.close()
         captureSession = null
+    }
+
+    private fun restartRecordingVideo() {
+        stopRecordingVideo()
+        startPreview()
     }
 
     private fun stopRecordingVideo() {
@@ -596,7 +644,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         if (activity != null) showToast("Video saved: $nextVideoAbsolutePath")
         nextVideoAbsolutePath = null
-        startPreview()
     }
 
     private fun showToast(message : String) = Toast.makeText(activity, message, LENGTH_SHORT).show()

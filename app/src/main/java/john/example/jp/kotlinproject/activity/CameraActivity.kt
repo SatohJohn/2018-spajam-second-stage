@@ -53,7 +53,7 @@ class CameraActivity : AppCompatActivity() {
                 imageView.setVisibility(VISIBLE)
                 textureView.setVisibility(INVISIBLE)
 
-                CameraUtil.saveBitmap(rotatedBitmap, contentResolver)
+                CameraUtil.saveBitmap(rotatedBitmap)
 
                 (mCamera as CameraStateMachine).close()
 
@@ -105,7 +105,7 @@ class CameraActivity : AppCompatActivity() {
                 imageView.setVisibility(VISIBLE)
                 textureView.setVisibility(INVISIBLE)
 
-                CameraUtil.saveBitmap(rotatedBitmap, contentResolver)
+                CameraUtil.saveBitmap(rotatedBitmap)
             }
         })
     }

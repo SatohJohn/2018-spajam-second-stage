@@ -72,7 +72,7 @@ class CameraUtil {
         }
 
         @Throws(IOException::class)
-        fun saveBitmap(saveImage: Bitmap, contentResolver : ContentResolver) {
+        fun saveBitmap(saveImage: Bitmap) {
 
             var fileName = getFileName(".jpg")
             val AttachName = getDirectoryInfo().getAbsolutePath() + "/" + fileName
@@ -88,12 +88,12 @@ class CameraUtil {
             }
 
             // save index
-            val values = ContentValues()
-            val contentResolver = contentResolver
-            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            values.put(MediaStore.Images.Media.TITLE, fileName)
-            values.put("_data", AttachName)
-            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+//            val values = ContentValues()
+//            val contentResolver = contentResolver
+//            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+//            values.put(MediaStore.Images.Media.TITLE, fileName)
+//            values.put("_data", AttachName)
+//            contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
         }
 
         fun getDirectoryInfo() : File{
