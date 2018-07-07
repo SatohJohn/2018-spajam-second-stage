@@ -504,6 +504,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     if (isRecordingVideo == false) {
                         isRecordingVideo = true
                         startRecordingVideo()
+
+                        if(_isRecording == false)
+                            doRecord()
                     }
                 }
             } catch (e: CameraAccessException) {
@@ -515,6 +518,10 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder?) {
         builder?.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+        if (isChanged == true) {
+            builder?.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            builder?.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+        }
     }
 
     /**
@@ -619,9 +626,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                             activity?.runOnUiThread {
                                 mediaRecorder?.start()
                             }
-
-                            // trim用のインジケータ
-                            trimEndMs = System.currentTimeMillis()
                         }
 
                         override fun onConfigureFailed(cameraCaptureSession: CameraCaptureSession) {
@@ -744,8 +748,17 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             val maxAmplitude = mediaRecorder?.getMaxAmplitude() ?: 0
             Log.v(this::class.java.simpleName, "amplitude: " + maxAmplitude);
             if (maxAmplitude > 3000) {
+
+                if (isRecordingVideo == false) {
+                    return
+                }
+
                 Log.i(this::class.java.simpleName, "発火するよ");
-                // TODO:このタイミングでtrimMovieを呼び出す
+
+                changeButton.post(Runnable {
+                    changeButton.callOnClick()
+                })
+
             }
         }
     }
