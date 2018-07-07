@@ -19,7 +19,7 @@ object MovieFileTrimer {
      * srcFileは存在しなかったらエラー
      * 動画の長さが足りなければエラー
      */
-    fun test(srcFile: File, destDirectory: File, startMs: Int, endMs: Int) {
+    fun test(srcFile: File, destDirectory: File, startMs: Long, endMs: Long) {
         val movieFile = FileDataSourceImpl(srcFile)
         val movie: Movie = MovieCreator.build(movieFile)
 

@@ -48,7 +48,9 @@ import android.view.*
 import android.widget.Button
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
+import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
+import java.io.File
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.Semaphore
@@ -219,6 +221,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         locationManager = getActivity()?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f, this)
+
+        // trim用のインジケータ
+        trimEndMs = System.currentTimeMillis()
     }
 
     override fun onResume() {
@@ -735,6 +740,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             Log.v(this::class.java.simpleName, "amplitude: " + maxAmplitude);
             if (maxAmplitude > 3000) {
                 Log.i(this::class.java.simpleName, "発火するよ");
+                // TODO:このタイミングでtrimMovieを呼び出す
             }
         }
     }
@@ -747,6 +753,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
     override fun onLocationChanged(location: Location) {
         Log.i("onLocationChanged", "latitude: " + location.getLatitude() + ", longitude: " + location.getLongitude());
         // 適当な場所で発火させる
+        // TODO:このタイミングでtrimMovieを呼び出す
     }
 
     override fun onStatusChanged(p0: String?, p1: Int, p2: Bundle?) {
@@ -759,5 +766,23 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     override fun onProviderDisabled(p0: String?) {
         // ネットワークから切れた
+    }
+
+    /*************************************
+     * 動画分割部分
+     *************************************/
+    // ミリ秒です
+    var trimEndMs: Long = 0
+    var TRIM_TIME_MS: Int = 5000
+
+    private fun trimMovie(movieFile: File) {
+        // endMsがTRIM_TIME_MS以上になっていなければそもそも動画の尺が短すぎるので何もしない
+        val movieEndTimeMs = System.currentTimeMillis() - trimEndMs;
+        if (movieEndTimeMs > TRIM_TIME_MS) {
+            // 動画保存で失敗する場合この時間を少し前だおししたほうがいいかも
+            val trimStartMs: Long = movieEndTimeMs - TRIM_TIME_MS
+            MovieFileTrimer.test(movieFile, CameraUtil.getDirectoryInfo(), trimStartMs, movieEndTimeMs)
+            trimEndMs = System.currentTimeMillis()
+        }
     }
 }
