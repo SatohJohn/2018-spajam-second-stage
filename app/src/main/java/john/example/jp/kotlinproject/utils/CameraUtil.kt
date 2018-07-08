@@ -102,6 +102,11 @@ class CameraUtil {
             return File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR)
         }
 
+        fun getWorkingDirectoryInfo() : File{
+            val SAVE_DIR = "/idol/workingtmp/"
+            return File(Environment.getExternalStorageDirectory().getPath() + SAVE_DIR)
+        }
+
         fun getFileName(extension : String) : String{
 
             val file = getDirectoryInfo()

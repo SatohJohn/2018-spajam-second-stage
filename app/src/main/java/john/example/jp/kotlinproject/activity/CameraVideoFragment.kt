@@ -51,6 +51,7 @@ import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
 import john.example.jp.kotlinproject.data.ThresholdData
 import john.example.jp.kotlinproject.data.UseCameraData
+import john.example.jp.kotlinproject.utils.MovieFileBinder
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File
@@ -254,6 +255,10 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                 if (isRecordingVideo == true) {
                     stopRecordingVideo()
                     trimMovie(File(filePath))
+
+                    val outputFile = File(CameraUtil.getDirectoryInfo().absolutePath + "/" + CameraUtil.getFileName(".mp4"))
+                    MovieFileBinder.test(CameraUtil.getWorkingDirectoryInfo(), outputFile)
+                    CameraUtil.getWorkingDirectoryInfo().deleteRecursively()
                 }
 
                 closeCamera()
@@ -558,7 +563,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         val cameraActivity = activity ?: return
 
         if (nextVideoAbsolutePath.isNullOrEmpty()) {
-            nextVideoAbsolutePath = getVideoFilePath(cameraActivity)
+            nextVideoAbsolutePath = getVideoFilePath()
         }
 
         val rotation = cameraActivity.windowManager.defaultDisplay.rotation
@@ -583,10 +588,14 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         }
     }
 
-    private fun getVideoFilePath(context: Context?): String {
+    private fun getVideoFilePath(): String {
 
         val fileName = CameraUtil.getFileName(".mp4")
-        filePath = CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
+        val directory = CameraUtil.getWorkingDirectoryInfo()
+        if (!directory.exists()) {
+            directory.mkdir()
+        }
+        filePath = CameraUtil.getWorkingDirectoryInfo().absolutePath + "/" + fileName
         return filePath
     }
 
