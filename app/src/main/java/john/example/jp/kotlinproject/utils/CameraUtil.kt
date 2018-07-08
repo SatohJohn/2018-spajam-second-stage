@@ -74,12 +74,12 @@ class CameraUtil {
         @Throws(IOException::class)
         fun saveBitmap(saveImage: Bitmap) {
 
-            var fileName = getFileName(".jpg")
+            var fileName = getFileName(".png")
             val AttachName = getDirectoryInfo().getAbsolutePath() + "/" + fileName
 
             try {
                 val out = FileOutputStream(AttachName)
-                saveImage.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                saveImage.compress(Bitmap.CompressFormat.PNG, 100, out)
                 out.flush()
                 out.close()
             } catch (e: IOException) {
