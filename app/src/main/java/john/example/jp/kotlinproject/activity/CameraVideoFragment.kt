@@ -214,7 +214,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         changeButton = view.findViewById<Button>(R.id.changeButton).also {
             it.setOnClickListener(this)
         }
-        info.setOnClickListener(this)
 
         if(_isRecording)
             stopRecord()
@@ -242,14 +241,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     override fun onClick(view: View) {
         when (view.id) {
-            R.id.info -> {
-                if (activity != null) {
-                    AlertDialog.Builder(activity)
-                            .setMessage("Error")
-                            .setPositiveButton(android.R.string.ok, null)
-                            .show()
-                }
-            }
             R.id.changeButton -> {
 
                 if (isRecordingVideo == true) {
