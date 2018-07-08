@@ -17,7 +17,6 @@ package john.example.jp.kotlinproject.activity
  */
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Configuration
@@ -32,7 +31,6 @@ import android.hardware.camera2.CameraDevice.TEMPLATE_RECORD
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.media.ImageReader
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
@@ -41,7 +39,6 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat.checkSelfPermission
-import android.support.v4.widget.PopupWindowCompat
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
@@ -55,10 +52,8 @@ import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
 import john.example.jp.kotlinproject.data.ThresholdData
 import john.example.jp.kotlinproject.data.UseCameraData
-import john.example.jp.kotlinproject.utils.MovieFileBinder
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
-import kotlinx.android.synthetic.main.popup_info.*
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -249,6 +244,15 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         (popupView.findViewById(R.id.closeButton)  as ImageView).setOnClickListener {
             mPopupWindow?.dismiss()
+        }
+
+        /**
+         * topに戻る
+         */
+        gotoHome.setOnClickListener {
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.hide(this)
+            transaction?.commit()
         }
     }
 

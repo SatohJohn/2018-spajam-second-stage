@@ -6,16 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".activity.CameraActivity">
 
-    <ImageView
-        android:id="@+id/gotoHome"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/menu_btn_menu" />
-
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <john.example.jp.kotlinproject.activity.AutoFitTextureView
             android:id="@+id/textureView"
@@ -57,5 +50,13 @@
         android:layout_marginBottom="63dp"
         android:visibility="invisible"
         app:srcCompat="@drawable/menu_btn_start_on" />
+
+    <ImageView
+        android:id="@+id/gotoHome"
+        android:layout_width="194dp"
+        android:layout_height="22dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        app:srcCompat="@drawable/menu_btn_menu" />
 
 </RelativeLayout>
