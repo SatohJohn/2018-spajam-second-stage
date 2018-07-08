@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import android.view.MotionEvent
 import john.example.jp.kotlinproject.R
 import john.example.jp.kotlinproject.data.UseCameraData
 
@@ -57,7 +58,16 @@ class MainActivity : AppCompatActivity() {
             val intent: Intent = Intent(this, DebugActivity::class.java)
             startActivity(intent)
         }
+        pager?.setOnClickListener {
+            radioButton1_1.isChecked=true
+            radioButton1_2.isChecked=false
+            radioButton1_3.isChecked=false
+        }
+    }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+
+        return super.onTouchEvent(event)
     }
 
 
