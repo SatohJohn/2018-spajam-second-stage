@@ -7,11 +7,12 @@
     android:layout_margin="50dp"
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
-
     <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="150dp"
         app:srcCompat="@drawable/menu_btn_02_off" />
 
 </LinearLayout>
