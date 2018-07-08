@@ -32,6 +32,12 @@
             android:label="@string/title_activity_camera"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+
+        <activity android:name=".activity.DebugActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

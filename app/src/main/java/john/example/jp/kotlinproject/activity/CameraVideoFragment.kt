@@ -49,6 +49,8 @@ import android.widget.Button
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
+import john.example.jp.kotlinproject.data.ThresholdData
+import john.example.jp.kotlinproject.data.UseCameraData
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File
@@ -106,8 +108,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      */
     private lateinit var textureView: AutoFitTextureView
 
-    private lateinit var imageReader : ImageReader
-
     /**
      * Button to record video
      */
@@ -139,6 +139,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      */
     private var isRecordingVideo = false
 
+    private var filePath = ""
+
     /**
      * An additional thread for running tasks that shouldn't block the UI.
      */
@@ -163,8 +165,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      * Orientation of the camera sensor
      */
     private var sensorOrientation = 0
-
-    private var useCameraKind = CameraMetadata.LENS_FACING_BACK
     private var isChanged = false
 
     /**
@@ -222,9 +222,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         locationManager = getActivity()?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f, this)
-
-        // trim用のインジケータ
-        trimEndMs = System.currentTimeMillis()
     }
 
     override fun onResume() {
@@ -256,6 +253,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
                 if (isRecordingVideo == true) {
                     stopRecordingVideo()
+                    trimMovie(File(filePath))
                 }
 
                 closeCamera()
@@ -264,13 +262,13 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     stopBackgroundThread()
                 }
 
-                if (useCameraKind == CameraMetadata.LENS_FACING_BACK)
+                if (UseCameraData.useCameraKind == CameraMetadata.LENS_FACING_BACK)
                 {
-                    useCameraKind = CameraMetadata.LENS_FACING_FRONT
+                    UseCameraData.useCameraKind = CameraMetadata.LENS_FACING_FRONT
                 }
                 else
                 {
-                    useCameraKind = CameraMetadata.LENS_FACING_BACK
+                    UseCameraData.useCameraKind = CameraMetadata.LENS_FACING_BACK
                 }
 
                 isChanged = !isChanged
@@ -382,7 +380,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
             for (cameraId in (manager as CameraManager).getCameraIdList()) {
                 var characteristics = (manager as CameraManager).getCameraCharacteristics(cameraId)
-                if (characteristics.get(CameraCharacteristics.LENS_FACING) == useCameraKind) {
+                if (characteristics.get(CameraCharacteristics.LENS_FACING) == UseCameraData.useCameraKind) {
 
                     // Choose the sizes for camera preview and video recording
                     val characteristics = manager.getCameraCharacteristics(cameraId)
@@ -504,6 +502,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     if (isRecordingVideo == false) {
                         isRecordingVideo = true
                         startRecordingVideo()
+
+                        if(_isRecording == false)
+                            doRecord()
                     }
                 }
             } catch (e: CameraAccessException) {
@@ -515,6 +516,10 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder?) {
         builder?.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
+        if (isChanged == true) {
+            builder?.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
+            builder?.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH)
+        }
     }
 
     /**
@@ -580,8 +585,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun getVideoFilePath(context: Context?): String {
 
-        var fileName = CameraUtil.getFileName(".mp4")
-        return CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
+        val fileName = CameraUtil.getFileName(".mp4")
+        filePath = CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
+        return filePath
     }
 
     private fun startRecordingVideo() {
@@ -739,9 +745,19 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
             // これで音の大きさが1秒ごとに取れているっぽい
             val maxAmplitude = mediaRecorder?.getMaxAmplitude() ?: 0
             Log.v(this::class.java.simpleName, "amplitude: " + maxAmplitude);
-            if (maxAmplitude > 3000) {
+
+            if (maxAmplitude > ThresholdData.audioThreshold) {
+
+                if (isRecordingVideo == false) {
+                    return
+                }
+
                 Log.i(this::class.java.simpleName, "発火するよ");
-                // TODO:このタイミングでtrimMovieを呼び出す
+
+                changeButton.post(Runnable {
+                    changeButton.callOnClick()
+                })
+
             }
         }
     }
@@ -782,7 +798,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         if (movieEndTimeMs > TRIM_TIME_MS) {
             // 動画保存で失敗する場合この時間を少し前だおししたほうがいいかも
             val trimStartMs: Long = movieEndTimeMs - TRIM_TIME_MS
-            MovieFileTrimer.test(movieFile, CameraUtil.getDirectoryInfo(), trimStartMs, movieEndTimeMs)
+            MovieFileTrimer.test(movieFile, CameraUtil.getDirectoryInfo())
             trimEndMs = System.currentTimeMillis()
         }
     }
