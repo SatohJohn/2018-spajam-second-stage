@@ -54,6 +54,7 @@ import john.example.jp.kotlinproject.data.ThresholdData
 import john.example.jp.kotlinproject.data.UseCameraData
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -235,10 +236,11 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
         mPopupWindow?.setOutsideTouchable(true);
         mPopupWindow?.setFocusable(true);
 
-        val width: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300.0f, getResources().getDisplayMetrics());
-        mPopupWindow?.setWindowLayoutMode(width.toInt(), WindowManager.LayoutParams.WRAP_CONTENT);
-        mPopupWindow?.setWidth(width.toInt());
-        mPopupWindow?.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        val width: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300.0f, getResources().getDisplayMetrics())
+        val height: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 450.0f, getResources().getDisplayMetrics())
+        mPopupWindow?.setWindowLayoutMode(width.toInt(), height.toInt())
+        mPopupWindow?.setWidth(width.toInt())
+        mPopupWindow?.setHeight(height.toInt())
 
         mPopupWindow?.showAtLocation(view, Gravity.CENTER, 0, 0)
 

@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             savedInstanceState ?: supportFragmentManager.beginTransaction()
                     .replace(R.id.container, CameraVideoFragment.newInstance())
                     .commit()
+
             button.visibility = View.INVISIBLE
 
         }
