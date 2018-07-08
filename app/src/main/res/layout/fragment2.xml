@@ -12,7 +12,7 @@
         android:layout_height="350dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="30dp"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="200dp"
         app:srcCompat="@drawable/menu_btn_02_off" />
 
 </LinearLayout>
