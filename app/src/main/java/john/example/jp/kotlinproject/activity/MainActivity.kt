@@ -1,12 +1,17 @@
 package john.example.jp.kotlinproject.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.drawable.Drawable
 import android.hardware.camera2.CameraMetadata
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.View
 import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -24,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     var currentPage: Int = 0
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -58,11 +64,22 @@ class MainActivity : AppCompatActivity() {
             val intent: Intent = Intent(this, DebugActivity::class.java)
             startActivity(intent)
         }
-        pager?.setOnClickListener {
-            radioButton1_1.isChecked=true
-            radioButton1_2.isChecked=false
-            radioButton1_3.isChecked=false
-        }
+
+        pager!!.setOnTouchListener(View.OnTouchListener { view, motionEvent ->
+            when (motionEvent.action){
+                MotionEvent.ACTION_DOWN -> {
+
+                    radioButton1_1.isChecked=true
+                    radioButton1_2.isChecked=false
+                    radioButton1_3.isChecked=false
+                }
+                MotionEvent.ACTION_UP -> {
+                    //view.performClick()
+                }
+            }
+            return@OnTouchListener true
+        })
+
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
