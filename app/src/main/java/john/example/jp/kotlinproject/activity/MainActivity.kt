@@ -12,6 +12,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
+import android.transition.Visibility
+import android.view.View
 import john.example.jp.kotlinproject.R
 import john.example.jp.kotlinproject.data.UseCameraData
 
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             savedInstanceState ?: supportFragmentManager.beginTransaction()
                     .replace(R.id.container, CameraVideoFragment.newInstance())
                     .commit()
+            button.visibility = View.INVISIBLE
 
         }
 
@@ -60,6 +63,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        button.visibility = View.VISIBLE
+        super.onResume()
+    }
 
     private val RECORD_REQUEST_CODE = 101
 
