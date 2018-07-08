@@ -41,11 +41,15 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.content.ContextCompat.checkSelfPermission
+import android.support.v4.widget.PopupWindowCompat
 import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
+import android.util.TypedValue
 import android.view.*
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.PopupWindow
 import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
@@ -54,6 +58,7 @@ import john.example.jp.kotlinproject.data.UseCameraData
 import john.example.jp.kotlinproject.utils.MovieFileBinder
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
+import kotlinx.android.synthetic.main.popup_info.*
 import java.io.File
 import java.io.IOException
 import java.util.*
@@ -207,6 +212,8 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                               savedInstanceState: Bundle?
     ): View? = inflater.inflate(R.layout.activity_camera, container, false)
 
+    private var mPopupWindow: PopupWindow? = null
+
     // ide上でlocationManager#requestLocationUpdatesがエラー表示されてしまうため追加
     @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -222,6 +229,27 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
         locationManager = getActivity()?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0f, this)
+
+        /***
+         * ポップアップ作成
+         */
+        val popupView = layoutInflater.inflate(R.layout.popup_info, null)
+        mPopupWindow = PopupWindow(context)
+        mPopupWindow?.contentView = popupView
+
+        mPopupWindow?.setOutsideTouchable(true);
+        mPopupWindow?.setFocusable(true);
+
+        val width: Float = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 300.0f, getResources().getDisplayMetrics());
+        mPopupWindow?.setWindowLayoutMode(width.toInt(), WindowManager.LayoutParams.WRAP_CONTENT);
+        mPopupWindow?.setWidth(width.toInt());
+        mPopupWindow?.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+
+        mPopupWindow?.showAtLocation(view, Gravity.CENTER, 0, 0)
+
+        (popupView.findViewById(R.id.closeButton)  as ImageView).setOnClickListener {
+            mPopupWindow?.dismiss()
+        }
     }
 
     override fun onResume() {
@@ -247,9 +275,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     stopRecordingVideo()
                     trimMovie(File(filePath))
 
-                    val outputFile = File(CameraUtil.getDirectoryInfo().absolutePath + "/" + CameraUtil.getFileName(".mp4"))
-                    MovieFileBinder.test(CameraUtil.getWorkingDirectoryInfo(), outputFile)
-                    CameraUtil.getWorkingDirectoryInfo().deleteRecursively()
+//                    val outputFile = File(CameraUtil.getDirectoryInfo().absolutePath + "/" + CameraUtil.getFileName(".mp4"))
+//                    MovieFileBinder.test(CameraUtil.getWorkingDirectoryInfo(), outputFile)
+//                    CameraUtil.getWorkingDirectoryInfo().deleteRecursively()
                 }
 
                 closeCamera()
@@ -581,12 +609,17 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun getVideoFilePath(): String {
 
+//        val fileName = CameraUtil.getFileName(".mp4")
+//        val directory = CameraUtil.getWorkingDirectoryInfo()
+//        if (!directory.exists()) {
+//            directory.mkdir()
+//        }
+//
+//        filePath = CameraUtil.getWorkingDirectoryInfo().absolutePath + "/" + fileName
+//        return filePath
+
         val fileName = CameraUtil.getFileName(".mp4")
-        val directory = CameraUtil.getWorkingDirectoryInfo()
-        if (!directory.exists()) {
-            directory.mkdir()
-        }
-        filePath = CameraUtil.getWorkingDirectoryInfo().absolutePath + "/" + fileName
+        filePath = CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
         return filePath
     }
 
