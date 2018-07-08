@@ -275,9 +275,9 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     stopRecordingVideo()
                     trimMovie(File(filePath))
 
-                    val outputFile = File(CameraUtil.getDirectoryInfo().absolutePath + "/" + CameraUtil.getFileName(".mp4"))
-                    MovieFileBinder.test(CameraUtil.getWorkingDirectoryInfo(), outputFile)
-                    CameraUtil.getWorkingDirectoryInfo().deleteRecursively()
+//                    val outputFile = File(CameraUtil.getDirectoryInfo().absolutePath + "/" + CameraUtil.getFileName(".mp4"))
+//                    MovieFileBinder.test(CameraUtil.getWorkingDirectoryInfo(), outputFile)
+//                    CameraUtil.getWorkingDirectoryInfo().deleteRecursively()
                 }
 
                 closeCamera()
@@ -609,12 +609,17 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
     private fun getVideoFilePath(): String {
 
+//        val fileName = CameraUtil.getFileName(".mp4")
+//        val directory = CameraUtil.getWorkingDirectoryInfo()
+//        if (!directory.exists()) {
+//            directory.mkdir()
+//        }
+//
+//        filePath = CameraUtil.getWorkingDirectoryInfo().absolutePath + "/" + fileName
+//        return filePath
+
         val fileName = CameraUtil.getFileName(".mp4")
-        val directory = CameraUtil.getWorkingDirectoryInfo()
-        if (!directory.exists()) {
-            directory.mkdir()
-        }
-        filePath = CameraUtil.getWorkingDirectoryInfo().absolutePath + "/" + fileName
+        filePath = CameraUtil.getDirectoryInfo().getAbsolutePath() + "/" + fileName
         return filePath
     }
 
