@@ -3,6 +3,7 @@ package john.example.jp.kotlinproject.activity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.camera2.CameraMetadata
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
@@ -12,6 +13,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.ViewPager
 import john.example.jp.kotlinproject.R
+import john.example.jp.kotlinproject.data.UseCameraData
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +41,9 @@ class MainActivity : AppCompatActivity() {
 //
 //            // 新しくアクティビティを開く
 //            startActivityForResult(intent, MY_REQUEST_CODE)
+
+            // TODO:CameraVideoFragmentを呼ぶ前にカメラを設定
+            UseCameraData.useCameraKind = CameraMetadata.LENS_FACING_BACK
 
             savedInstanceState ?: supportFragmentManager.beginTransaction()
                     .replace(R.id.container, CameraVideoFragment.newInstance())

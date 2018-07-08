@@ -50,6 +50,7 @@ import android.widget.Toast
 import android.widget.Toast.LENGTH_SHORT
 import john.example.jp.kotlinproject.*
 import john.example.jp.kotlinproject.data.ThresholdData
+import john.example.jp.kotlinproject.data.UseCameraData
 import john.example.jp.kotlinproject.utils.MovieFileTrimer
 import kotlinx.android.synthetic.main.activity_camera.*
 import java.io.File
@@ -106,8 +107,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      * An [AutoFitTextureView] for camera preview.
      */
     private lateinit var textureView: AutoFitTextureView
-
-    private lateinit var imageReader : ImageReader
 
     /**
      * Button to record video
@@ -166,8 +165,6 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
      * Orientation of the camera sensor
      */
     private var sensorOrientation = 0
-
-    private var useCameraKind = CameraMetadata.LENS_FACING_BACK
     private var isChanged = false
 
     /**
@@ -265,13 +262,13 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
                     stopBackgroundThread()
                 }
 
-                if (useCameraKind == CameraMetadata.LENS_FACING_BACK)
+                if (UseCameraData.useCameraKind == CameraMetadata.LENS_FACING_BACK)
                 {
-                    useCameraKind = CameraMetadata.LENS_FACING_FRONT
+                    UseCameraData.useCameraKind = CameraMetadata.LENS_FACING_FRONT
                 }
                 else
                 {
-                    useCameraKind = CameraMetadata.LENS_FACING_BACK
+                    UseCameraData.useCameraKind = CameraMetadata.LENS_FACING_BACK
                 }
 
                 isChanged = !isChanged
@@ -383,7 +380,7 @@ class CameraVideoFragment : Fragment(), View.OnClickListener,
 
             for (cameraId in (manager as CameraManager).getCameraIdList()) {
                 var characteristics = (manager as CameraManager).getCameraCharacteristics(cameraId)
-                if (characteristics.get(CameraCharacteristics.LENS_FACING) == useCameraKind) {
+                if (characteristics.get(CameraCharacteristics.LENS_FACING) == UseCameraData.useCameraKind) {
 
                     // Choose the sizes for camera preview and video recording
                     val characteristics = manager.getCameraCharacteristics(cameraId)
